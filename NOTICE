@@ -1,0 +1,15 @@
+InsightPilot includes and modifies software from E2B Fragments:
+https://github.com/e2b-dev/fragments
+Base commit: 3b11c7fcd4dcc37b2f1effde35960cf6ec4bd3c7
+
+The original Apache License, Version 2.0 is retained in LICENSE.
+The original Git history and source components are retained. The upstream
+README is archived at docs/upstream-readme.md with adjusted resource links.
+The original application page was moved to app/playground/page.tsx and adapted
+for the upgraded SDK. The new root page serves the InsightPilot workbench.
+
+InsightPilot adds the CSV analysis, approval, verification, and workbench
+modules documented in README.md and docs/design.md. Adapted source files
+carry modification notices. package.json was modified for InsightPilot,
+package-lock.json was regenerated, and eslint.config.mjs replaces the
+original .eslintrc.json. The diff against the base commit lists all changes.

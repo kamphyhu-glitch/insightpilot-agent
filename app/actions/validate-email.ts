@@ -1,5 +1,9 @@
 'use server'
 
+// Modified for InsightPilot from E2B Fragments.
+
+import { isFragmentsPlaygroundEnabled } from '@/lib/deployment-mode'
+
 export type EmailValidationResponse = {
   address: string
   status: string
@@ -24,6 +28,8 @@ export type EmailValidationResponse = {
 }
 
 export async function validateEmail(email: string): Promise<boolean> {
+  if (!isFragmentsPlaygroundEnabled()) return false
+
   if (!process.env.ZEROBOUNCE_API_KEY) {
     return true
   }

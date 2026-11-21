@@ -1,16 +1,12 @@
+// Modified for InsightPilot from E2B Fragments.
 import './globals.css'
 import { PostHogProvider, ThemeProvider } from './providers'
 import { Toaster } from '@/components/ui/toaster'
-import { Analytics } from '@vercel/analytics/next'
-import { GoogleTagManager } from '@next/third-parties/google'
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-
-const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Fragments by E2B',
-  description: "Open-source version of Anthropic's Artifacts",
+  title: 'InsightPilot — 从数据，找到下一步',
+  description: 'An inspectable data analysis Agent: plan, approve, execute and verify. Built on E2B Fragments.',
 }
 
 export default function RootLayout({
@@ -19,22 +15,18 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      {process.env.NEXT_PUBLIC_GTM_ID && (
-        <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID} />
-      )}
+    <html lang="zh-CN" suppressHydrationWarning>
       <PostHogProvider>
-        <body className={inter.className}>
+        <body>
           <ThemeProvider
             attribute="class"
-            defaultTheme="dark"
-            enableSystem
+            defaultTheme="light"
+            enableSystem={false}
             disableTransitionOnChange
           >
             {children}
           </ThemeProvider>
           <Toaster />
-          <Analytics />
         </body>
       </PostHogProvider>
     </html>

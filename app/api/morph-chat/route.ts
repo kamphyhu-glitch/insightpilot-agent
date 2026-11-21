@@ -1,4 +1,6 @@
+// Modified for InsightPilot from E2B Fragments.
 import { handleAPIError, createRateLimitResponse } from '@/lib/api-errors'
+import { isFragmentsPlaygroundEnabled } from '@/lib/deployment-mode'
 import { Duration } from '@/lib/duration'
 import {
   getClientApiKey,
@@ -24,6 +26,9 @@ const ratelimitWindow = process.env.RATE_LIMIT_WINDOW
 // System prompt is constructed dynamically below using the current file context
 
 export async function POST(req: Request) {
+  if (!isFragmentsPlaygroundEnabled()) {
+    return Response.json({ error: 'Fragments Playground is disabled.' }, { status: 403 })
+  }
   const request = await parseRequest(req, morphChatRequestSchema)
   if ('error' in request) {
     return request.error

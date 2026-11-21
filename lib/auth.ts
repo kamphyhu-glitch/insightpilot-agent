@@ -1,3 +1,4 @@
+// Modified for InsightPilot from E2B Fragments.
 import { supabase } from './supabase'
 import { ViewType } from '@/components/auth'
 import { Session } from '@supabase/supabase-js'
@@ -71,17 +72,17 @@ export function useAuth(
         setRecovery(false)
       }
 
-      if (_event === 'SIGNED_IN' && !recovery) {
-        getUserTeam(session as Session).then(setUserTeam)
+      if (_event === 'SIGNED_IN' && session && !recovery) {
+        getUserTeam(session).then(setUserTeam)
         setAuthDialog(false)
-        if (!session?.user.user_metadata.is_fragments_user) {
+        if (!session.user.user_metadata.is_fragments_user) {
           supabase?.auth.updateUser({
             data: { is_fragments_user: true },
           })
         }
-        posthog.identify(session?.user.id, {
-          email: session?.user.email,
-          supabase_id: session?.user.id,
+        posthog.identify(session.user.id, {
+          email: session.user.email,
+          supabase_id: session.user.id,
         })
         posthog.capture('sign_in')
       }

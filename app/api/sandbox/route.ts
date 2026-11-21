@@ -1,3 +1,5 @@
+// Modified for InsightPilot from E2B Fragments.
+import { isFragmentsPlaygroundEnabled } from '@/lib/deployment-mode'
 import { FragmentSchema } from '@/lib/schema'
 import { ExecutionResultInterpreter, ExecutionResultWeb } from '@/lib/types'
 import { Sandbox } from '@e2b/code-interpreter'
@@ -7,6 +9,9 @@ const sandboxTimeout = 10 * 60 * 1000 // 10 minute in ms
 export const maxDuration = 60
 
 export async function POST(req: Request) {
+  if (!isFragmentsPlaygroundEnabled()) {
+    return Response.json({ error: 'Upstream sandbox execution is disabled. Use the InsightPilot approval workflow.' }, { status: 403 })
+  }
   const {
     fragment,
     userID,

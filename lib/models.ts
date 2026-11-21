@@ -1,3 +1,4 @@
+// Modified for InsightPilot from E2B Fragments.
 import modelsList from './models.json'
 import { createAnthropic } from '@ai-sdk/anthropic'
 import { createFireworks } from '@ai-sdk/fireworks'
@@ -5,7 +6,7 @@ import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { createVertex } from '@ai-sdk/google-vertex'
 import { createMistral } from '@ai-sdk/mistral'
 import { createOpenAI } from '@ai-sdk/openai'
-import { createOllama } from 'ollama-ai-provider'
+import { createOllama } from 'ollama-ai-provider-v2'
 
 export type LLMModel = {
   id: string
@@ -77,7 +78,7 @@ export function getModelParams(config: LLMModelConfig) {
     topK,
     frequencyPenalty,
     presencePenalty,
-    maxTokens,
+    maxOutputTokens: maxTokens,
   }
 }
 
@@ -86,20 +87,22 @@ export function getModelClient(model: LLMModel, config: LLMModelConfig) {
   const apiKey = getClientApiKey(model, config)
 
   const providerConfigs = {
-    anthropic: () => createAnthropic({ apiKey })(modelNameString),
-    openai: () => createOpenAI({ apiKey })(modelNameString),
+    anthropic: () =>
+      createAnthropic({ apiKey, baseURL: 'https://api.anthropic.com/v1' })(modelNameString),
+    openai: () =>
+      createOpenAI({ apiKey, baseURL: 'https://api.openai.com/v1' }).chat(modelNameString),
     google: () => createGoogleGenerativeAI({ apiKey })(modelNameString),
     mistral: () => createMistral({ apiKey })(modelNameString),
     groq: () =>
       createOpenAI({
         apiKey: apiKey || process.env.GROQ_API_KEY,
         baseURL: 'https://api.groq.com/openai/v1',
-      })(modelNameString),
+      }).chat(modelNameString),
     togetherai: () =>
       createOpenAI({
         apiKey: apiKey || process.env.TOGETHER_API_KEY,
         baseURL: 'https://api.together.xyz/v1',
-      })(modelNameString),
+      }).chat(modelNameString),
     ollama: () =>
       createOllama({ baseURL: process.env.OLLAMA_BASE_URL })(modelNameString),
     fireworks: () =>
@@ -119,12 +122,12 @@ export function getModelClient(model: LLMModel, config: LLMModelConfig) {
       createOpenAI({
         apiKey: apiKey || process.env.XAI_API_KEY,
         baseURL: 'https://api.x.ai/v1',
-      })(modelNameString),
+      }).chat(modelNameString),
     deepseek: () =>
       createOpenAI({
         apiKey: apiKey || process.env.DEEPSEEK_API_KEY,
         baseURL: 'https://api.deepseek.com/v1',
-      })(modelNameString),
+      }).chat(modelNameString),
   }
 
   const createClient =

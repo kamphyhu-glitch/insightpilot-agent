@@ -1,5 +1,8 @@
 'use server'
 
+// Modified for InsightPilot from E2B Fragments.
+
+import { isFragmentsPlaygroundEnabled } from '@/lib/deployment-mode'
 import { Duration, ms } from '@/lib/duration'
 import { Sandbox } from '@e2b/code-interpreter'
 import { kv } from '@vercel/kv'
@@ -14,6 +17,8 @@ export async function publish(
   teamID: string | undefined,
   accessToken: string | undefined,
 ) {
+  if (!isFragmentsPlaygroundEnabled()) throw new Error('Fragments Playground is disabled.')
+
   const parsedUrl = new URL(url)
   if (!parsedUrl.hostname.endsWith('.e2b.app')) {
     throw new Error('URL must be on *.e2b.app domain')

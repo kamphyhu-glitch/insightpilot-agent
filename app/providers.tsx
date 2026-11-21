@@ -1,7 +1,11 @@
 'use client'
 
-import { ThemeProvider as NextThemesProvider } from 'next-themes'
-import { type ThemeProviderProps } from 'next-themes/dist/types'
+// Modified for InsightPilot from E2B Fragments.
+
+import {
+  ThemeProvider as NextThemesProvider,
+  type ThemeProviderProps,
+} from 'next-themes'
 import posthog from 'posthog-js'
 import { PostHogProvider as PostHogProviderJS } from 'posthog-js/react'
 

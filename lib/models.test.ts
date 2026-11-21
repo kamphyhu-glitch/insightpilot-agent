@@ -1,3 +1,4 @@
+// Modified for InsightPilot from E2B Fragments.
 import {
   getClientApiKey,
   getModelClient,
@@ -38,6 +39,7 @@ const providerEnvKeys = [
 
 const originalFetch = globalThis.fetch
 let requestedHosts: string[] = []
+let requestedPaths: string[] = []
 let requestedAuthorization: (string | null)[] = []
 
 beforeEach(() => {
@@ -46,10 +48,12 @@ beforeEach(() => {
   }
   delete process.env.OLLAMA_BASE_URL
   requestedHosts = []
+  requestedPaths = []
   requestedAuthorization = []
   globalThis.fetch = async (input, init) => {
-    const url = input instanceof Request ? input.url : input.toString()
-    requestedHosts.push(new URL(url).host)
+    const url = new URL(input instanceof Request ? input.url : input.toString())
+    requestedHosts.push(url.host)
+    requestedPaths.push(url.pathname)
     requestedAuthorization.push(new Headers(init?.headers).get('authorization'))
     throw new Error('network is disabled in tests')
   }
@@ -78,6 +82,9 @@ describe('getModelClient', () => {
       await sendPrompt(client as LanguageModel)
 
       assert.deepEqual(requestedHosts, [host])
+      if (['openai', 'groq', 'togetherai', 'xai', 'deepseek'].includes(providerId)) {
+        assert.match(requestedPaths[0], /\/chat\/completions$/)
+      }
     })
   }
 
@@ -177,7 +184,7 @@ describe('getModelParams', () => {
       topK: undefined,
       frequencyPenalty: undefined,
       presencePenalty: undefined,
-      maxTokens: 100,
+      maxOutputTokens: 100,
     })
   })
 })

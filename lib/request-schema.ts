@@ -1,3 +1,4 @@
+// Modified for InsightPilot from E2B Fragments.
 import { LLMModelConfig } from './models'
 import { fragmentSchema } from './schema'
 import templates, { Templates } from './templates'
@@ -33,7 +34,7 @@ const templateIds = Object.keys(templates) as [string, ...string[]]
 // The client picks templates by ID. The prompt is built from the server's
 // template definitions, not from the values in the request.
 const templateSchema = z
-  .record(z.enum(templateIds), z.unknown())
+  .partialRecord(z.enum(templateIds), z.unknown())
   .refine((selected) => Object.keys(selected).length > 0)
   .transform(
     (selected) =>

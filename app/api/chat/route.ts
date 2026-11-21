@@ -1,4 +1,6 @@
+// Modified for InsightPilot from E2B Fragments.
 import { handleAPIError, createRateLimitResponse } from '@/lib/api-errors'
+import { isFragmentsPlaygroundEnabled } from '@/lib/deployment-mode'
 import { Duration } from '@/lib/duration'
 import {
   getClientApiKey,
@@ -22,6 +24,9 @@ const ratelimitWindow = process.env.RATE_LIMIT_WINDOW
   : '1d'
 
 export async function POST(req: Request) {
+  if (!isFragmentsPlaygroundEnabled()) {
+    return Response.json({ error: 'Fragments Playground is disabled.' }, { status: 403 })
+  }
   const request = await parseRequest(req, chatRequestSchema)
   if ('error' in request) {
     return request.error

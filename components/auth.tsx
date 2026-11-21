@@ -1,3 +1,4 @@
+// Modified for InsightPilot from E2B Fragments.
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -559,7 +560,7 @@ function Auth({
   magicLink = false,
   onSignUpValidate,
   metadata,
-}: AuthProps): JSX.Element | null {
+}: AuthProps): React.JSX.Element | null {
   const [authView, setAuthView] = useState<ViewType>(view)
   const {
     loading,

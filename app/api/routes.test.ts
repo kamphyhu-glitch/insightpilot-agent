@@ -1,5 +1,9 @@
+// Modified for InsightPilot from E2B Fragments.
 import { POST as chat } from './chat/route'
 import { POST as morphChat } from './morph-chat/route'
+import { POST as sandbox } from './sandbox/route'
+import { publish } from '@/app/actions/publish'
+import { validateEmail } from '@/app/actions/validate-email'
 import modelsList from '@/lib/models.json'
 import templates from '@/lib/templates'
 import assert from 'node:assert/strict'
@@ -8,11 +12,15 @@ import { afterEach, beforeEach, describe, it } from 'node:test'
 const kvHost = 'kv.test'
 
 const originalFetch = globalThis.fetch
+const originalLiveFlag = process.env.INSIGHTPILOT_ENABLE_LIVE
+const originalPlaygroundFlag = process.env.ENABLE_FRAGMENTS_PLAYGROUND
 let requestedHosts: string[] = []
 let requestedBodies: string[] = []
 let rateLimitChecked = false
 
 beforeEach(() => {
+  process.env.INSIGHTPILOT_ENABLE_LIVE = 'true'
+  process.env.ENABLE_FRAGMENTS_PLAYGROUND = 'true'
   process.env.OPENAI_API_KEY = 'test-key'
   process.env.FIREWORKS_API_KEY = 'test-key'
   process.env.GOOGLE_VERTEX_PROJECT = 'test-project'
@@ -37,8 +45,24 @@ beforeEach(() => {
   }
 })
 
+it('blocks legacy routes and actions when Live is disabled, even with the Playground flag set', async () => {
+  process.env.INSIGHTPILOT_ENABLE_LIVE = 'false'
+  for (const handler of [chat, morphChat, sandbox]) {
+    const response = await handler(new Request('http://localhost', { method: 'POST', body: 'invalid json' }))
+    assert.equal(response.status, 403)
+  }
+  await assert.rejects(publish('invalid URL', 'fixture', '1h', undefined, undefined), /disabled/)
+  assert.equal(await validateEmail('test@example.com'), false)
+  assert.equal(rateLimitChecked, false)
+  assert.deepEqual(requestedHosts, [])
+})
+
 afterEach(() => {
   globalThis.fetch = originalFetch
+  if (originalLiveFlag === undefined) delete process.env.INSIGHTPILOT_ENABLE_LIVE
+  else process.env.INSIGHTPILOT_ENABLE_LIVE = originalLiveFlag
+  if (originalPlaygroundFlag === undefined) delete process.env.ENABLE_FRAGMENTS_PLAYGROUND
+  else process.env.ENABLE_FRAGMENTS_PLAYGROUND = originalPlaygroundFlag
 })
 
 function firstModelOf(providerId: string) {
@@ -90,13 +114,16 @@ function validBody(route: Route, providerId = 'openai'): any {
   }
 }
 
-function post(route: Route, body: unknown) {
-  return route.POST(
+async function post(route: Route, body: unknown) {
+  const response = await route.POST(
     new Request(`http://localhost${route.name}`, {
       method: 'POST',
       body: typeof body === 'string' ? body : JSON.stringify(body),
     }),
   )
+  // The SDK starts its provider work asynchronously when streaming a response.
+  await response.text()
+  return response
 }
 
 const invalidRequests: [string, (body: any) => unknown][] = [
