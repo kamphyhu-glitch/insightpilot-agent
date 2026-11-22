@@ -2,7 +2,11 @@
 
 从数据，找到下一步。一个面向产品与运营人员、可以检查计划与验证结果的数据分析 Agent 原型。
 
-基于 [E2B Fragments](https://github.com/e2b-dev/fragments) 二次开发，保留 Apache-2.0 许可证与上游完整 Git 历史。当前交付为本地 MVP，尚未发布线上版本。
+基于 [E2B Fragments](https://github.com/e2b-dev/fragments) 二次开发，保留 Apache-2.0 许可证与上游完整 Git 历史。
+
+## 线上演示
+
+使用示例或上传 CSV 即可体验完整分析流程，无需 API Key。免费实例闲置后会休眠，唤醒可能需要约一分钟。 [打开 InsightPilot Demo](https://insightpilot-agent.onrender.com)
 
 ## 体验流程
 
